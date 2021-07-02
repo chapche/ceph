@@ -8713,21 +8713,20 @@ int RGWRados::cls_bucket_list_unordered(const DoutPrefixProvider *dpp,
     } else {
       // so now we have the key used to compute the bucket index shard
       // and can extract the specific shard from it
+      string index_hash_source = obj_key.name;
       if (obj_key.ns == RGW_OBJ_NS_MULTIPART) {
         // Use obj_key.ns == RGW_OBJ_NS_MULTIPART instead of
         // the implementation relying on MultipartMetaFilter
         // because MultipartMetaFilter only checks .meta suffix, which may
         // exclude data multiparts but include some regular objects with .meta suffix
         // by mistake.
-        string index_hash_source;
         r = parse_index_hash_source(obj_key.name, &index_hash_source);
         if (r < 0) {
           return r;
         }
-        current_shard = svc.bi_rados->bucket_shard_index(index_hash_source, num_shards);
-      } else {
-        current_shard = svc.bi_rados->bucket_shard_index(obj_key.name, num_shards);
-      }
+      } 
+      current_shard = svc.bi_rados->bucket_shard_index(index_hash_source, num_shards);
+      
     }
   }
 
